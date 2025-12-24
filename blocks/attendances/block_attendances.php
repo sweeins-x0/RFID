@@ -10,18 +10,27 @@ class block_attendances extends block_base {
     public function get_content() {
         global $DB, $USER;
 
-        $today = date('Ymd');
-        $logs = $DB->get_records('block_presensi_log', ['attdate' => $today]);
+        $this->content = new stdClass();
+
+        try {
+            $attendances = $DB->get_records('block_attendances', ['attdate' => (int) date('Ymd')]);
+        }
+        catch (dml_exception $e) {
+            $this->content->text = $e->getMessage();
+            return $this->content;
+        }
 
         if ($this->content !== null) {
             return $this->content;
         }
 
-        $this->content = new stdClass();
         $context = context_course::instance($this->page->course->id);
 
         if (has_capability('block/attendances:teacher', $context)) {
             $this->content->text = 'Capability (Teacher)';
+            foreach ($attendances as $attendance) {
+                $this->content->text .= $attendance->userid;
+            }
         }
         else if (has_capability('block/attendances:student', $context)) {
             $this->content->text = 'Capability (Student)';
