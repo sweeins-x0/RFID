@@ -13,16 +13,18 @@ class external extends \external_api {
         ]);
     }
 
-    public static function submit($userid, $courseid, $status) {
+    public static function submit($userid) {
         global $DB;
 
+        // e2a2ece15eb08fdebc7e971645350753
+
         $atdate = (int) date('Ymd');
-        $attime = (int) time('Hi');
-        if $attime > 700
+        $attime = (int) date('Hi');
+        if ($attime > 700)
             $status = 'late';
-        else if $attime > 630
+        else if ($attime > 630)
             $status = 'ontime';
-        else if $attime > 0
+        else if ($attime > 0)
             $status = 'early';
 
         $record = (object)[
@@ -35,12 +37,16 @@ class external extends \external_api {
         $DB->insert_record('local_attendances', $record);
         $DB->insert_record('block_attendances', $record);
 
-        return ['success' => true];
+        return [
+            'success' => true,
+            'status' => $status,
+        ];
     }
 
     public static function submit_returns() {
         return new \external_single_structure([
-            'success' => new \external_value(PARAM_BOOL, 'Result')
+            'success' => new \external_value(PARAM_BOOL, 'Success'),
+            'status'  => new \external_value(PARAM_TEXT, 'Status')
         ]);
     }
 }
