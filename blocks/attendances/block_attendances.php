@@ -1,44 +1,54 @@
-<?php
-defined('MOODLE_INTERNAL') || die();
+    <?php
+    defined('MOODLE_INTERNAL') || die();
 
-class block_attendances extends block_base {
+    class block_attendances extends block_base {
 
-    public function init() {
-        $this->title = 'Attendances';
-    }
-
-    public function get_content() {
-        global $DB, $USER;
-
-        $this->content = new stdClass();
-
-        try {
-            $attendances = $DB->get_records('block_attendances', ['attdate' => (int) date('Ymd')]);
+        public function init() {
+            $this->title = 'Attendances';
         }
-        catch (dml_exception $e) {
-            $this->content->text = $e->getMessage();
+
+        public function get_content() {
+            if ($this->content !== null)
+                return $this->content;
+
+            $context = context_course::instance($this->page->course->id);
+            $this->content = new stdClass();
+            $attendances = [];
+            
+            if (!$this->get_database($this->content, $attendances))
+                return $this->content;
+
+            if (has_capability('block/attendances:teacher', $context))
+                $this->render_teacher($this->content, $attendances);
+
+            else if (has_capability('block/attendances:student', $context))
+                $this->render_student($this->content, $attendances);
+
             return $this->content;
         }
 
-        if ($this->content !== null) {
-            return $this->content;
+        private function get_database(&$content, &$attendances) {
+            global $DB, $USER;
+
+            try {
+                $attendances = $DB->get_records('block_attendances', ['atdate' => (int) date('Ymd')]);
+            }
+            catch (dml_exception $e) {
+                $content->text = $e->getMessage();
+                return false;
+            }
+
+            return true;
         }
 
-        $context = context_course::instance($this->page->course->id);
-
-        if (has_capability('block/attendances:teacher', $context)) {
+        private function render_teacher(&$content, &$attendances) {
             $this->content->text = 'Capability (Teacher)';
             foreach ($attendances as $attendance) {
                 $this->content->text .= $attendance->userid;
             }
         }
-        else if (has_capability('block/attendances:student', $context)) {
-            $this->content->text = 'Capability (Student)';
-        }
-        else {
-            $this->content->text = '';
-        }
 
-        return $this->content;
+        private function render_student($content, $attendances) {
+
+        }
     }
-}
