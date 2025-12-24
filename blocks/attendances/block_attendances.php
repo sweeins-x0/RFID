@@ -42,10 +42,10 @@
         }
 
         private function render_teacher(&$content, &$attendances) {
-            $this->content->text = 'Capability (Teacher)';
-            foreach ($attendances as $attendance) {
-                $this->content->text .= $attendance->userid;
-            }
+            global $PAGE;            
+
+            $renderer = $PAGE->get_renderer('block_attendances');
+            $this->content->text = $renderer->table($attendances);
         }
 
         private function render_student($content, $attendances) {
