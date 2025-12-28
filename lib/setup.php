@@ -208,6 +208,7 @@ if (!isset($CFG->admin)) {   // Just in case it isn't defined in config.php
 
 // Set up some paths.
 $CFG->libdir = $CFG->dirroot .'/lib';
+$CFG->moddir = $CFG->dirroot .'/mod';
 
 // Allow overriding of tempdir but be backwards compatible
 if (!isset($CFG->tempdir)) {

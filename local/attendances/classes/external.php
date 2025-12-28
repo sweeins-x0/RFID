@@ -18,6 +18,8 @@ class external extends \external_api {
 
         // e2a2ece15eb08fdebc7e971645350753
 
+        // 85ea5daba226b7d197a39e3dc0faf2c0
+
         $atdate = (int) date('Ymd');
         $attime = (int) date('Hi');
         if ($attime > 700)
